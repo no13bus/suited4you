@@ -21,6 +21,7 @@ repos_branchs = gh.repos('angular')('angular').branches().get()
 # {'days': [0, 0, 0, 0, 0, 0, 0], 'total': 0, 'week': 1418515200}] 类似这样的数据
 repo_ca = gh.repos('angular')('angular').stats().commit_activity().get()
 
+
 # GET /repos/:owner/:repo/events
 # repo的最近活动情况 动态
 
