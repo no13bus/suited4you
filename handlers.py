@@ -12,9 +12,8 @@ import tornado.ioloop
 import tornado.options
 import tornado.web
 import tornado.httpclient
-from lib.github import *
-from lib.reddit import *
-from lib.stackoverflow import *
+from settings import gh
+import tasks
 
 
 class IndexHandler(tornado.web.RequestHandler):
@@ -25,7 +24,15 @@ class IndexHandler(tornado.web.RequestHandler):
         
         self.render('index.html')
 
-    # def post(self):
-    #     v2ex_id = self.get_argument('v2ex_id')
-    #     self.redirect('/u/%s' % v2ex_id, permanent=True)
+    def post(self):
+        onerepo = self.get_argument('onerepo')
+        tworepo = self.get_argument('tworepo')
+        repo_owner_1 = onerepo.split('/')[-2].lower()
+        repo_name_1 = onerepo.split('/')[-1].lower()
+        repo_owner_2 = tworepo.split('/')[-2].lower()
+        repo_name_2 = tworepo.split('/')[-1].lower()
 
+        tasks.diff_tasks.delay(repo_owner_1, repo_name_1, repo_owner_2, repo_name_2)
+        
+        self.write('ok');
+        # self.redirect('/u/%s' % v2ex_id, permanent=True)

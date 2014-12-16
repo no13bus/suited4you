@@ -1,7 +1,7 @@
 #coding: utf-8
 
 
-from lib.github import *
+from libs.github import *
 from settings import GITHUB_TOKEN
 
 

@@ -18,7 +18,15 @@ import redis
 pool = redis.ConnectionPool(host='localhost', port=6379, db=1)
 RD = redis.Redis(connection_pool=pool)
 
+#### libs settings
+from libs.github import *
+from libs.reddit import *
+from libs.stackoverflow import *
 
+GITHUB_TOKEN = '05aa6e1541ecdb53f473b8e32f2a4e45b1ea0a27'
+gh = GitHub(GITHUB_TOKEN)
+reddit = Reddit()
+sof = Sof()
 
 #celery settings
 CELERYD_POOL_RESTARTS = True
@@ -35,6 +43,7 @@ CELERYBEAT_SCHEDULE = {
     },
     
 }
+
 
 
 ####dev enviriment or deploy enviriment
