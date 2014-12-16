@@ -7,7 +7,8 @@ from tornado.options import options, define
 # import tornadoredis
 import os
 import handlers
-# from db import ConnectDB
+import pymongo
+from db import db
 
 define('port', default=8000, type=int, help='server port')
 define('template_path', default=os.path.join(
@@ -25,7 +26,8 @@ class SuitedApp(web.Application):
 
         ]
         web.Application.__init__(self, routes, **settings)
-        # self.session = ConnectDB()
+        conn = pymongo.Connection("localhost", 27017)
+        self.db = db
 
 
 if __name__ == '__main__':

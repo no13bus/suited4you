@@ -27,7 +27,7 @@ class Sof(object):
     def get_tags_info(self, tags):
         tags_str = ';'.join(tags)
         url = '%s/tags/%s/info?order=desc&sort=popular&site=stackoverflow' % (sof_api_url, tags_str)
-        j = _get_json(url)
+        j = self._get_json(url)
         if not j:
             return False
         result = {item['name']:item['count'] for item in j['items']}
@@ -36,7 +36,7 @@ class Sof(object):
 
     def get_tag_faq(self, tag):
         url = '%s/tags/%s/faq?site=stackoverflow' % (sof_api_url, tag)
-        j = _get_json(url)
+        j = self._get_json(url)
         if not j:
             return False
         ## return all of faqs items
