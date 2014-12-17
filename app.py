@@ -4,7 +4,6 @@ __author__ = 'no13bus'
 from tornado import web, ioloop, httpserver
 from settings import settings
 from tornado.options import options, define
-# import tornadoredis
 import os
 import handlers
 import pymongo

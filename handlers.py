@@ -16,8 +16,8 @@ from db import db
 
 
 class TaskStatusHandler(tornado.web.RequestHandler):
-    def get(self):
-        taskid = self.get_argument('taskid', '')
+    def get(self, taskid):
+        # taskid = self.get_argument('taskid', '')
         if not taskid:
             self.write('')
         work = AsyncResult(taskid)
@@ -49,21 +49,24 @@ class IndexHandler(tornado.web.RequestHandler):
         
         self.render('index.html', taskid=taskid, onerepo_owner=onerepo_owner, onerepo_name=onerepo_name, tworepo_owner=tworepo_owner,tworepo_name=tworepo_name)
 
-
-
 class DiffHandler(tornado.web.RequestHandler):
     def get(self):
         onerepo_owner = self.get_argument('onerepo_owner', '')
         onerepo_name = self.get_argument('onerepo_name', '')
         tworepo_owner = self.get_argument('tworepo_owner', '')
         tworepo_name = self.get_argument('tworepo_name', '')
+        # print onerepo_owner
         coll = db.project
         onerepo = coll.find_one({"repo_owner": onerepo_owner, "repo_name": onerepo_name})
         if onerepo:
             del onerepo['_id']
+        print tworepo_owner
+        print tworepo_name
         tworepo = coll.find_one({"repo_owner": tworepo_owner, "repo_name": tworepo_name})
         if tworepo:
             del tworepo['_id']
+        # print onerepo['commit_activity']
+        print tworepo
         self.render("diff.html", onerepo=onerepo, tworepo=tworepo)
 
     def post(self):

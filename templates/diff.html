@@ -2,9 +2,9 @@
 {% block content %}
     <div class="container">
         <div class="row" style="margin:100px auto 40px;">
-            
+                
                 <div id="main" style="height:400px"></div>
-            
+                
 
         </div>
     </div>
@@ -29,17 +29,18 @@
         function (ec) {
             // 基于准备好的dom，初始化echarts图表
             var myChart = ec.init(document.getElementById('main')); 
-            
-            var option = {
+            var one_data = [{{ onerepo['watchers_count'] }}, {{ onerepo['stargazers_count'] }}, {{ onerepo['forks_count'] }}, {{ onerepo['open_issues'] }}, {{ onerepo['repo_ctb_count'] }}, {{ onerepo['sof_count'] }}];
+            var two_data = [{{ tworepo['watchers_count'] }}, {{ tworepo['stargazers_count'] }}, {{ tworepo['forks_count'] }}, {{ tworepo['open_issues'] }}, {{ tworepo['repo_ctb_count'] }}, {{ tworepo['sof_count'] }}];
+            option = {
                 title : {
-                    text: '世界人口总量',
-                    subtext: '数据来自网络'
+                    text: 'VS',
+                    subtext: 'data from github, stackoverflow, reddit'
                 },
                 tooltip : {
                     trigger: 'axis'
                 },
                 legend: {
-                    data:['2011年', '2012年']
+                    data:["{{ onerepo['repo_owner'] }}/{{ onerepo['repo_name'] }}", "{{ tworepo['repo_owner'] }}/{{ tworepo['repo_name'] }}"]
                 },
                 toolbox: {
                     show : true,
@@ -51,7 +52,7 @@
                         saveAsImage : {show: true}
                     }
                 },
-                calculable : false,
+                calculable : true,
                 xAxis : [
                     {
                         type : 'value',
@@ -61,23 +62,22 @@
                 yAxis : [
                     {
                         type : 'category',
-                        data : ['巴西','印尼','美国','印度','中国','世界人口(万)']
+                        data : ['watcher','stars','forks','open_issues','contributors','sof_count']
                     }
                 ],
                 series : [
                     {
-                        name:'2011年',
+                        name:"{{ onerepo['repo_owner'] }}/{{ onerepo['repo_name'] }}",
                         type:'bar',
-                        data:[18203, 23489, 29034, 104970, 131744, 630230]
+                        data:one_data
                     },
                     {
-                        name:'2012年',
+                        name:"{{ tworepo['repo_owner'] }}/{{ tworepo['repo_name'] }}",
                         type:'bar',
-                        data:[19325, 23438, 31000, 121594, 134141, 681807]
+                        data:two_data
                     }
                 ]
             };
-                
             // 为echarts对象加载数据 
             myChart.setOption(option);
         }

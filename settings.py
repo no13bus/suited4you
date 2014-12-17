@@ -30,6 +30,7 @@ sof = Sof()
 
 
 
+
 #celery settings
 CELERYD_POOL_RESTARTS = True
 CELERYD_FORCE_EXECV = True

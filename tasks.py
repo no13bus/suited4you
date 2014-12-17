@@ -31,19 +31,21 @@ logger.addHandler(handler)
 logger.setLevel(logging.DEBUG)
 # rd = settings.RD
 
+
+
+
 @celery.task
 def github_task(repo_owner_1, repo_name_1, repo_owner_2, repo_name_2):
     try:
         for repo_owner, repo_name in [(repo_owner_1, repo_name_1), (repo_owner_2, repo_name_2)]:
-            repo_tmp = gh.repos(repo_owner)(repo_name)
-            repo = repo_tmp.get()
+            repo = gh.repos(repo_owner)(repo_name).get()
             repo_attr = [repo.watchers_count, repo.stargazers_count, repo.forks_count, repo.open_issues_count]
-            repo_ctb = repo_tmp.contributors().get()
+            repo_ctb = gh.repos(repo_owner)(repo_name).contributors().get()
             repo_ctb_count = len(repo_ctb)
-            repo_lang = repo_tmp.languages().get()
+            repo_lang = gh.repos(repo_owner)(repo_name).languages().get()
             # repo_lang = sorted(repo_lang.iteritems(), key=lambda x:x[1], reverse=True)
             # repo_lang = repo_lang[0][0]
-            repo_ca = repo_tmp.stats().commit_activity().get()
+            repo_ca = gh.repos(repo_owner)(repo_name).stats().commit_activity().get()
             ### mongo store
             coll = db.project
             one_repo = coll.find_one({"repo_owner": repo_owner, "repo_name": repo_name})
@@ -51,18 +53,13 @@ def github_task(repo_owner_1, repo_name_1, repo_owner_2, repo_name_2):
                 one_repo['watchers_count'] = repo_attr[0]
                 one_repo['stargazers_count'] = repo_attr[1]
                 one_repo['forks_count'] = repo_attr[2]
-                one_repo['open_issues_count'] = repo_attr[3]
+                one_repo['open_issues'] = repo_attr[3]
                 one_repo['repo_ctb_count'] = repo_ctb_count
                 one_repo['language'] = repo_lang
-                one_repo['commit_activity'] = repo_ca
+                if repo_ca:
+                    one_repo['commit_activity'] = repo_ca
+                
                 coll.save(one_repo)
-            else:
-                one_repo = {"repo_owner": repo_owner, "repo_name": repo_name,
-                            "watchers_count":repo_attr[0], "stargazers_count":repo_attr[1],
-                            "forks_count":repo_attr[2], "open_issues_count":repo_attr[3],
-                            "repo_ctb_count":repo_ctb_count, "language":repo_lang,
-                            "commit_activity":repo_ca}
-                coll.insert(one_repo)
 
     except Exception as ex:
         print ex
@@ -98,7 +95,7 @@ def sof_task(repo_owner_1, repo_name_1, repo_owner_2, repo_name_2):
         print sof_ex
         return False
     #mongo store
-    print repo_owner_1, repo_name_1, repo_owner_2, repo_name_2
+    # print repo_owner_1, repo_name_1, repo_owner_2, repo_name_2
     coll = db.project
     one_sof = coll.find_one({"repo_owner": repo_owner_1, "repo_name": repo_name_1})
     if one_sof and repo_name_1 in tags_infos:
@@ -126,17 +123,26 @@ def diff_tasks(repo_owner_1, repo_name_1, repo_owner_2, repo_name_2):
     except Exception as ex2:
         print ex2
         return 2
+    for k, v in [(repo_owner_1, repo_name_1), (repo_owner_2, repo_name_2)]:
+        coll = db.project
+        repo = coll.find_one({"repo_owner": k, "repo_name": v})
+        if not repo:
+            coll.insert({"repo_owner": k, "repo_name": v})
 
     task_group = []
-    github_s = github_task(repo_owner_1, repo_name_1, repo_owner_2, repo_name_2)
+    github_s = github_task.s(repo_owner_1, repo_name_1, repo_owner_2, repo_name_2)
     print 'github_s'
-    sof_s = sof_task(repo_owner_1, repo_name_1, repo_owner_2, repo_name_2)
+    sof_s = sof_task.s(repo_owner_1, repo_name_1, repo_owner_2, repo_name_2)
     print 'sof_task'
-    reddit_s = reddit_task(repo_owner_1, repo_name_1, repo_owner_2, repo_name_2)
+    reddit_s = reddit_task.s(repo_owner_1, repo_name_1, repo_owner_2, repo_name_2)
     print 'reddit_task'
-
+    task_group.append(github_s)
+    task_group.append(sof_s)
+    task_group.append(reddit_s)
+    g1 = group(task_group)
+    group_re = g1().get()
     
-    return [github_s, sof_s, reddit_s]
+    return group_re
 
 
 # ===========================================================================

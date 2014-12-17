@@ -33,7 +33,7 @@
             </div>
         </div>
       </form>
-
+      {% if taskid %}
       <div class="row" style="text-align: center;">
         <div class="col col-md-5" style="margin:auto;">
           <div class="progress progress-striped active">
@@ -41,6 +41,7 @@
           </div>
         </div>
       </div>
+      {% end %}
       
     </div>
 {% end %}
@@ -62,7 +63,7 @@
                           if (timerid) {
                              clearInterval(timerid);
                           }
-                          window.location.href="/diff/?onerepo_owner={{ onerepo_owner }}&onerepo_name={{ onerepo_name }}&tworepo_owner={{ onerepo_name }}&tworepo_name={{ tworepo_name }}";
+                          window.location.href="/diff?onerepo_owner={{ onerepo_owner }}&onerepo_name={{ onerepo_name }}&tworepo_owner={{ tworepo_owner }}&tworepo_name={{ tworepo_name }}";
                           
                       }else{
                          $('.progress').removeClass("active").removeClass("progress-striped");
