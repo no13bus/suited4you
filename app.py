@@ -22,7 +22,8 @@ class SuitedApp(web.Application):
     def __init__(self):
         routes = [
             (r'/', handlers.IndexHandler),
-            # (r'/u/(.*)', handlers.UsersHandler),
+            (r'/taskstatus/(.*)', handlers.TaskStatusHandler),
+            (r'/diff', handlers.DiffHandler),
 
         ]
         web.Application.__init__(self, routes, **settings)

@@ -98,16 +98,16 @@ def sof_task(repo_owner_1, repo_name_1, repo_owner_2, repo_name_2):
         print sof_ex
         return False
     #mongo store
+    print repo_owner_1, repo_name_1, repo_owner_2, repo_name_2
     coll = db.project
     one_sof = coll.find_one({"repo_owner": repo_owner_1, "repo_name": repo_name_1})
-    if one_sof:
-        print tags_infos
+    if one_sof and repo_name_1 in tags_infos:
         one_sof['sof_count'] = tags_infos[repo_name_1]
         coll.save(one_sof)
 
     one_sof_2 = coll.find_one({"repo_owner": repo_owner_2, "repo_name": repo_name_2})
-    if one_sof_2:
-        print tags_infos
+
+    if one_sof_2 and repo_name_2 in tags_infos:
         one_sof_2['sof_count'] = tags_infos[repo_name_2]
         coll.save(one_sof_2)
     
@@ -129,8 +129,38 @@ def diff_tasks(repo_owner_1, repo_name_1, repo_owner_2, repo_name_2):
 
     task_group = []
     github_s = github_task(repo_owner_1, repo_name_1, repo_owner_2, repo_name_2)
+    print 'github_s'
     sof_s = sof_task(repo_owner_1, repo_name_1, repo_owner_2, repo_name_2)
+    print 'sof_task'
     reddit_s = reddit_task(repo_owner_1, repo_name_1, repo_owner_2, repo_name_2)
+    print 'reddit_task'
 
     
     return [github_s, sof_s, reddit_s]
+
+
+# ===========================================================================
+
+
+# 查询一段时间内的fork的数量变化
+# SELECT repository_forks, created_at
+# FROM [githubarchive:github.timeline]
+# WHERE 
+#      repository_url = "https://github.com/celery/celery"
+# ORDER BY created_at DESC
+
+# 查询一段时间内的star的数量变化
+# SELECT repository_watchers, created_at
+# FROM [githubarchive:github.timeline]
+# WHERE 
+#      repository_url = "https://github.com/celery/celery"
+# ORDER BY created_at DESC
+
+# 查看issue的变化
+# SELECT repository_open_issues, created_at
+# FROM [githubarchive:github.timeline]
+# WHERE 
+#      repository_url = "https://github.com/celery/celery"
+# ORDER BY created_at DESC
+
+# ===========================================================================

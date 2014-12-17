@@ -1,5 +1,4 @@
 {% extends base.html %}
-
 {% block content %}
     <div class="container">
       <form action="" method="POST">
@@ -34,5 +33,51 @@
             </div>
         </div>
       </form>
+
+      <div class="row" style="text-align: center;">
+        <div class="col col-md-5" style="margin:auto;">
+          <div class="progress progress-striped active">
+            <div class="progress-bar" style="width: 100%;">下载中</div>
+          </div>
+        </div>
+      </div>
+      
     </div>
+{% end %}
+
+{% block js %}
+    {% if taskid %}
+      <script type="text/javascript">
+          var timerid;
+          function getForm(){  
+            $.ajax({ url: "/taskstatus/{{ taskid }}",
+                    async:true,
+                    success: function(response){
+                      // var obj=eval(response);
+                      var task_status = response;
+                      if (task_status=="SUCCESS") {
+                          $('.progress').removeClass("active").removeClass("progress-striped");
+                          $('.progress div').html("Done.");
+                          ///下载文件
+                          if (timerid) {
+                             clearInterval(timerid);
+                          }
+                          window.location.href="/diff/?onerepo_owner={{ onerepo_owner }}&onerepo_name={{ onerepo_name }}&tworepo_owner={{ onerepo_name }}&tworepo_name={{ tworepo_name }}";
+                          
+                      }else{
+                         $('.progress').removeClass("active").removeClass("progress-striped");
+                         $('.progress').addClass("active").addClass("progress-striped");
+                         $('.progress div').html("making......");
+                      }
+                }});
+          }
+
+            // getForm();
+            $(document).ready(function() {  
+                  timerid = window.setInterval(getForm,1000);
+            });
+
+
+      </script>
+    {% end %}
 {% end %}
