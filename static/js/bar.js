@@ -1,24 +1,3 @@
-{% extends base.html %}
-{% block content %}
-    <div class="container">
-        <div class="row" style="margin:50px auto 40px;">
-            <div id="general" style="height:400px; width: 100%;"></div>
-        </div>
-        <div class="row" style="margin:50px auto 40px;">
-            <div class="col col-md-6">
-                <div id="lang1" style="height:400px; width: 50%;"></div>
-            </div>
-            <div class="col col-md-6">
-                <div id="lang2" style="height:400px; width: 50%;"></div>
-            </div>
-        </div>
-    </div>
-
-{% end %}
-
-{% block js %}
-<script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
-<script>
 // 路径配置
     require.config({
         paths: {
@@ -35,8 +14,7 @@
         function (ec) {
             // 基于准备好的dom，初始化echarts图表
             var myChart = ec.init(document.getElementById('general')); 
-            var myChart_lang1 = ec.init(document.getElementById('lang1')); 
-            var myChart_lang2 = ec.init(document.getElementById('lang2')); 
+            var myChart_lang = ec.init(document.getElementById('lang')); 
             var mydata0=[];
             var mydata1=[];
             var pie_legend1=[];
@@ -54,7 +32,7 @@
                     trigger: 'axis'
                 },
                 legend: {
-                    data:["{{ onerepo_owner }}/{{ onerepo_name }}", "{{ tworepo_owner }}/{{ tworepo_name }}"],
+                    data:["angular/angular", "emberjs/ember.js"],
                     x : 'left',
                 },
                 toolbox: {
@@ -82,23 +60,22 @@
                 ],
                 series : [
                     {
-                        name:"{{ onerepo_owner }}/{{ onerepo_name }}",
+                        name:"angular/angular",
                         type:'bar',
                         
                     },
                     {
-                        name:"{{ tworepo_owner }}/{{ tworepo_name }}",
+                        name:"emberjs/ember.js",
                         type:'bar',
                         
                     }
                 ]
             };
-            
-            option_lang1 = {
+            option_lang = {
                 title : {
-                    text: "{{ onerepo_owner }}/{{ onerepo_name }}",
+                    text: "angular/angular language",
                     subtext: 'from github',
-                    x:'right'
+                    x:'center'
                 },
                 tooltip : {
                     trigger: 'item',
@@ -110,7 +87,7 @@
                     data:['直接访问','邮件营销','联盟广告','视频广告','搜索引擎']
                 },
                 toolbox: {
-                    show : false,
+                    show : true,
                     feature : {
                         mark : {show: false},
                         dataView : {show: false, readOnly: false},
@@ -148,62 +125,10 @@
                 ]
             };
 
-            option_lang2 = {
-                title : {
-                    text: "{{ tworepo_owner }}/{{ tworepo_name }}",
-                    subtext: 'from github',
-                    x:'right'
-                },
-                tooltip : {
-                    trigger: 'item',
-                    formatter: "{a} <br/>{b} : {c} ({d}%)"
-                },
-                legend: {
-                    orient : 'vertical',
-                    x : 'left',
-                    data:['直接访问','邮件营销','联盟广告','视频广告','搜索引擎']
-                },
-                toolbox: {
-                    show : false,
-                    feature : {
-                        mark : {show: false},
-                        dataView : {show: false, readOnly: false},
-                        magicType : {
-                            show: false, 
-                            type: ['pie', 'funnel'],
-                            option: {
-                                funnel: {
-                                    x: '25%',
-                                    width: '50%',
-                                    funnelAlign: 'left',
-                                    max: 1548
-                                }
-                            }
-                        },
-                        restore : {show: true},
-                        saveAsImage : {show: true}
-                    }
-                },
-                calculable : true,
-                series : [
-                    {
-                        name:'访问来源',
-                        type:'pie',
-                        radius : '55%',
-                        center: ['50%', '60%'],
-                        data:[
-                            {value:335, name:'直接访问'},
-                            {value:310, name:'邮件营销'},
-                            {value:234, name:'联盟广告'},
-                            {value:135, name:'视频广告'},
-                            {value:1548, name:'搜索引擎'}
-                        ]
-                    }
-                ]
-            };
+
             
             $.ajax({  
-                    url: "/diffdata?onerepo_owner={{ onerepo_owner }}&onerepo_name={{ onerepo_name }}&tworepo_owner={{ tworepo_owner }}&tworepo_name={{ tworepo_name }}",
+                    url: "/diffdata?onerepo_owner=angular&onerepo_name=angular&tworepo_owner=emberjs&tworepo_name=ember.js",
                     dataType:"json", 
                     async:false,
                     success:function(point){
@@ -215,30 +140,16 @@
                           pie_legend1.push(key);
                           pie_data1.push({value:language1[key], name:key});
                       };
-                      var language2 = obj.tworepo.language;
-                      for (var key in language2) {
-                          pie_legend2.push(key);
-                          pie_data2.push({value:language2[key], name:key});
-                      };
 
                    },  
                     error: function(){alert('error!')},
             });
             option.series[0].data = mydata0;
             option.series[1].data = mydata1;
-            option_lang1.legend.data = pie_legend1;
-            option_lang1.series[0].data = pie_data1;
-
-            option_lang2.legend.data = pie_legend2;
-            option_lang2.series[0].data = pie_data2;
-
+            option_lang.legend.data = pie_legend1;
+            option_lang.series[0].data = pie_data1;
             // // 为echarts对象加载数据 
             myChart.setOption(option);
-            myChart_lang1.setOption(option_lang1);
-            myChart_lang2.setOption(option_lang2);
+            myChart_lang.setOption(option_lang);
         }
     );
-
-</script>
-
-{% end %}

@@ -23,6 +23,7 @@ class SuitedApp(web.Application):
             (r'/', handlers.IndexHandler),
             (r'/taskstatus/(.*)', handlers.TaskStatusHandler),
             (r'/diff', handlers.DiffHandler),
+            (r'/diffdata', handlers.GetdataHandler),
 
         ]
         web.Application.__init__(self, routes, **settings)

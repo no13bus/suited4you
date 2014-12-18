@@ -54,3 +54,4 @@ docs/_build/
 target/
 
 settings_dev.py
+dump.rdb

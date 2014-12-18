@@ -49,13 +49,13 @@ class IndexHandler(tornado.web.RequestHandler):
         
         self.render('index.html', taskid=taskid, onerepo_owner=onerepo_owner, onerepo_name=onerepo_name, tworepo_owner=tworepo_owner,tworepo_name=tworepo_name)
 
-class DiffHandler(tornado.web.RequestHandler):
+class GetdataHandler(tornado.web.RequestHandler):
     def get(self):
         onerepo_owner = self.get_argument('onerepo_owner', '')
         onerepo_name = self.get_argument('onerepo_name', '')
         tworepo_owner = self.get_argument('tworepo_owner', '')
         tworepo_name = self.get_argument('tworepo_name', '')
-        # print onerepo_owner
+        print onerepo_owner
         coll = db.project
         onerepo = coll.find_one({"repo_owner": onerepo_owner, "repo_name": onerepo_name})
         if onerepo:
@@ -66,8 +66,28 @@ class DiffHandler(tornado.web.RequestHandler):
         if tworepo:
             del tworepo['_id']
         # print onerepo['commit_activity']
-        print tworepo
-        self.render("diff.html", onerepo=onerepo, tworepo=tworepo)
+        self.write({"onerepo":onerepo, "tworepo":tworepo})
+        
+
+class DiffHandler(tornado.web.RequestHandler):
+    def get(self):
+        onerepo_owner = self.get_argument('onerepo_owner', '')
+        onerepo_name = self.get_argument('onerepo_name', '')
+        tworepo_owner = self.get_argument('tworepo_owner', '')
+        tworepo_name = self.get_argument('tworepo_name', '')
+        # print onerepo_owner
+        # coll = db.project
+        # onerepo = coll.find_one({"repo_owner": onerepo_owner, "repo_name": onerepo_name})
+        # if onerepo:
+        #     del onerepo['_id']
+        # print tworepo_owner
+        # print tworepo_name
+        # tworepo = coll.find_one({"repo_owner": tworepo_owner, "repo_name": tworepo_name})
+        # if tworepo:
+        #     del tworepo['_id']
+        # # print onerepo['commit_activity']
+        # print tworepo
+        self.render("diff.html", onerepo_owner=onerepo_owner, onerepo_name=onerepo_name, tworepo_owner=tworepo_owner, tworepo_name=tworepo_name)
 
     def post(self):
         pass
